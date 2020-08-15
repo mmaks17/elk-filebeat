@@ -1,0 +1,36 @@
+version: '2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+#    restart: always
+    volumes:
+     - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+     - ./elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+  filebeat:
+#    restart: always
+    image: docker.elastic.co/beats/filebeat:7.8.1
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./sample_log:/usr/share/filebeat/logs
+    links:
+       - elasticsearch
+       - kibana
+    depends_on:
+      - kibana
+  kibana:
+#    restart: always
+    image: docker.elastic.co/kibana/kibana:7.8.1
+    environment:
+      ELASTICSEARCH_URL: http://eleasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
