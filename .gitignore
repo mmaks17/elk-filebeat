@@ -1,2 +1,4 @@
 elasticsearch/data/*
 sample_log/*
+!elasticsearch/data/.gitkeep
+!sample_log/.gitkeep
